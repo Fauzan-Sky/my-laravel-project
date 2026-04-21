@@ -52,7 +52,13 @@ class Pesanan extends Model
         return $this->belongsTo(SlotWaktu::class, 'slot_id');
     }
 
+    // ✅ Diperbaiki: ditambah alias detailPesanan
     public function detail()
+    {
+        return $this->hasMany(DetailPesanan::class, 'pesanan_id');
+    }
+
+    public function detailPesanan()
     {
         return $this->hasMany(DetailPesanan::class, 'pesanan_id');
     }
