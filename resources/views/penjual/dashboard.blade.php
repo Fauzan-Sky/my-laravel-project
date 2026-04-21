@@ -515,6 +515,7 @@
             font-size: 13px;
             margin-bottom: 20px;
             font-weight: 500;
+            transition: opacity 0.6s ease; /* ✅ Tambahan untuk animasi fade */
         }
 
         .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
@@ -644,11 +645,12 @@
 ══════════════════════════════════ --}}
 <main class="main">
 
+    {{-- ✅ Flash message dengan auto-hide --}}
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div id="flash-message" class="alert alert-success">{{ session('success') }}</div>
     @endif
     @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
+        <div id="flash-message" class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
     {{-- ══ PAGE: DASHBOARD ══ --}}
@@ -665,9 +667,7 @@
                 <div class="stat-icon teal"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
                 <div class="stat-info">
                     <div class="stat-label">Total Pesanan Hari Ini</div>
-                    <div class="stat-value">
-                        {{ $totalPesananHariIni ?? 0 }}
-                    </div>
+                    <div class="stat-value">{{ $totalPesananHariIni ?? 0 }}</div>
                     <div class="stat-sub">pesanan masuk</div>
                 </div>
             </div>
@@ -675,9 +675,7 @@
                 <div class="stat-icon yellow"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
                 <div class="stat-info">
                     <div class="stat-label">Pendapatan Harian</div>
-                    <div class="stat-value">
-                        Rp {{ number_format($pendapatanHarian ?? 0, 0, ',', '.') }}
-                    </div>
+                    <div class="stat-value">Rp {{ number_format($pendapatanHarian ?? 0, 0, ',', '.') }}</div>
                     <div class="stat-sub">hari ini</div>
                 </div>
             </div>
@@ -685,9 +683,7 @@
                 <div class="stat-icon red"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
                 <div class="stat-info">
                     <div class="stat-label">Pesanan Menunggu</div>
-                    <div class="stat-value">
-                        {{ $pesananMenunggu ?? 0 }}
-                    </div>
+                    <div class="stat-value">{{ $pesananMenunggu ?? 0 }}</div>
                     <div class="stat-sub">perlu diproses</div>
                 </div>
             </div>
@@ -695,9 +691,7 @@
                 <div class="stat-icon green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 15.01 9 12.01"/></svg></div>
                 <div class="stat-info">
                     <div class="stat-label">Pesanan Selesai</div>
-                    <div class="stat-value">
-                        {{ $pesananSelesai ?? 0 }}
-                    </div>
+                    <div class="stat-value">{{ $pesananSelesai ?? 0 }}</div>
                     <div class="stat-sub">sudah diambil</div>
                 </div>
             </div>
@@ -1041,6 +1035,15 @@
 </main>
 
 <script>
+    // ✅ Auto-hide flash message setelah 3 detik
+    const flashMsg = document.getElementById('flash-message');
+    if (flashMsg) {
+        setTimeout(function() {
+            flashMsg.style.opacity = '0';
+            setTimeout(() => flashMsg.remove(), 600);
+        }, 3000);
+    }
+
     // ── Navigasi halaman ──
     function showPage(page) {
         ['dashboard', 'pesanan', 'stok'].forEach(p => {
