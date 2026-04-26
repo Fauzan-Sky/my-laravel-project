@@ -11,19 +11,26 @@ class Admin extends Authenticatable
 
     protected $guard = 'admin';
 
-    protected $table = 'admins';
-
     protected $fillable = [
-        'name', 'email', 'password',
-        'role', 'avatar', 'phone',
-        'is_active', 'last_login_at',
+        'name',
+        'email',
+        'password',
+        'role',
+        'is_active',
     ];
 
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
     protected $casts = [
-        'password'      => 'hashed',
-        'is_active'     => 'boolean',
-        'last_login_at' => 'datetime',
+        'is_active' => 'boolean',
+        'password'  => 'hashed',
     ];
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'superadmin';
+    }
 }

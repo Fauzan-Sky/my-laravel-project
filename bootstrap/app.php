@@ -16,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth.siswa'   => RoleMiddleware::class . ':siswa',
             'auth.penjual' => RoleMiddleware::class . ':penjual',
             'auth.admin'   => RoleMiddleware::class . ':admin',
+            'admin.auth'   => \App\Http\Middleware\AdminAuthenticated::class,
+            'admin.guest'  => \App\Http\Middleware\AdminGuest::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

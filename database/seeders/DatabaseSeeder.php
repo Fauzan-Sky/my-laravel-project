@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             PenjualSeeder::class,
             MenuSeeder::class,
             SlotWaktuSeeder::class,
+            AdminSeeder::class,
         ]);
     }
 }

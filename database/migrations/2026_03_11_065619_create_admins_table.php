@@ -13,11 +13,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('role')->default('admin'); // superadmin | admin
-            $table->string('avatar')->nullable();
-            $table->string('phone')->nullable();
+            $table->string('role')->default('admin'); // admin, superadmin
             $table->boolean('is_active')->default(true);
-            $table->timestamp('last_login_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
