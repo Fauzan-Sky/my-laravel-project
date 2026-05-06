@@ -29,9 +29,16 @@ class User extends Authenticatable
         'is_active' => 'boolean',
     ];
 
+    // Relasi lama (untuk siswa)
     public function pesanan()
     {
         return $this->hasMany(Pesanan::class, 'user_id');
+    }
+
+    // Relasi ke orders (untuk admin)
+    public function orders()
+    {
+        return $this->hasMany(\App\Models\Pesanan::class, 'user_id');
     }
 
     public function isSiswa(): bool   { return $this->role === 'siswa'; }

@@ -3,63 +3,88 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class SiswaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return view('admin.siswa.index');
+        $siswa = User::where('role', 'siswa')
+            ->withCount('pesanan')
+            ->withSum('pesanan', 'total_harga')
+            ->paginate(10);
+
+        return view('admin.siswa.index', compact('siswa'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function show($id)
     {
-        //
+        $siswa = User::where('role', 'siswa')
+            ->withCount('orders')
+            ->withSum('orders', 'total_harga')
+            ->findOrFail($id);
+
+        $riwayat = $siswa->orders()->latest()->take(10)->get();
+
+        return view('admin.siswa.show', compact('siswa', 'riwayat'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function edit($id)
     {
-        //
+        $siswa = User::where('role', 'siswa')->findOrFail($id);
+        return view('admin.siswa.edit', compact('siswa'));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $siswa = User::where('role', 'siswa')->findOrFail($id);
+
+        $request->validate([
+            'nis'          => 'required|unique:users,nis,' . $id,
+            'nama_lengkap' => 'required|string|max:255',
+            'kelas'        => 'required|string|max:50',
+            'nomer_hp'     => 'nullable|string|max:20',
+            'is_active'    => 'required|in:0,1',
+        ]);
+
+        $siswa->update($request->only([
+            'nis', 'nama_lengkap', 'kelas', 'nomer_hp', 'is_active'
+        ]));
+
+        return redirect()->route('admin.siswa.index')
+            ->with('success', 'Data siswa berhasil diupdate!');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy($id)
     {
-        //
+        $siswa = User::where('role', 'siswa')->findOrFail($id);
+        $siswa->delete();
+
+        return redirect()->route('admin.siswa.index')
+            ->with('success', 'Data siswa berhasil dihapus!');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    // Toggle aktif / nonaktif
+    public function toggle($id)
     {
-        //
+        $siswa = User::where('role', 'siswa')->findOrFail($id);
+        $siswa->update(['is_active' => !$siswa->is_active]);
+
+        $status = $siswa->is_active ? 'diaktifkan' : 'dinonaktifkan';
+
+        return redirect()->route('admin.siswa.index')
+            ->with('success', "Siswa berhasil {$status}!");
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    // Reset password ke NIS siswa
+    public function resetPassword($id)
     {
-        //
+        $siswa = User::where('role', 'siswa')->findOrFail($id);
+        $siswa->update(['password' => Hash::make($siswa->nis)]);
+
+        return redirect()->route('admin.siswa.index')
+            ->with('success', 'Password berhasil direset ke NIS siswa!');
     }
 }

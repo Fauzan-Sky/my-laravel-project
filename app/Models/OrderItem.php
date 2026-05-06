@@ -12,4 +12,10 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Menu::class);
     }
+
+    // ← TAMBAHKAN INI
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
 }

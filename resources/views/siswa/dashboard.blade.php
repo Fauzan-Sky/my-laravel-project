@@ -7,6 +7,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* ══════════════════════════════════════════
+           CSS VARIABLES
+        ══════════════════════════════════════════ */
         :root {
             --teal:       #1B6B7B;
             --teal-dark:  #155d6c;
@@ -22,7 +25,14 @@
             --white:      #ffffff;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ══════════════════════════════════════════
+           RESET & BASE
+        ══════════════════════════════════════════ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Poppins', sans-serif;
@@ -31,9 +41,11 @@
             min-height: 100vh;
         }
 
-        /* ════════════════════════════
+        a { text-decoration: none; }
+
+        /* ══════════════════════════════════════════
            NAVBAR
-        ════════════════════════════ */
+        ══════════════════════════════════════════ */
         .navbar {
             background: var(--white);
             border-bottom: 1px solid var(--border);
@@ -54,13 +66,13 @@
             gap: 32px;
         }
 
-        /* ── Logo ── */
+        /* Brand */
         .navbar-brand {
             display: flex;
             align-items: center;
             gap: 10px;
-            text-decoration: none;
             flex-shrink: 0;
+            color: inherit;
         }
 
         .brand-logo {
@@ -71,11 +83,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
         }
 
-        .brand-logo svg {
-            stroke: #fff;
+        .brand-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
+
+        /* Fallback jika gambar tidak ada */
+        .brand-logo svg { stroke: #fff; }
 
         .brand-text {
             font-size: 20px;
@@ -84,11 +103,9 @@
             letter-spacing: 0.3px;
         }
 
-        .brand-text span {
-            color: var(--text);
-        }
+        .brand-text span { color: var(--text); }
 
-        /* ── Nav Links ── */
+        /* Nav Links */
         .navbar-nav {
             display: flex;
             align-items: center;
@@ -106,49 +123,36 @@
             font-size: 14px;
             font-weight: 500;
             color: var(--muted);
-            text-decoration: none;
-            transition: all 0.2s;
             cursor: pointer;
             border: none;
             background: transparent;
             font-family: 'Poppins', sans-serif;
+            transition: background 0.2s, color 0.2s;
+            white-space: nowrap;
         }
 
-        .nav-link:hover {
-            background: var(--teal-light);
-            color: var(--teal);
-        }
+        .nav-link:hover  { background: var(--teal-light); color: var(--teal); }
+        .nav-link.active { background: var(--teal-light); color: var(--teal); font-weight: 600; }
 
-        .nav-link.active {
-            background: var(--teal-light);
-            color: var(--teal);
-            font-weight: 600;
-        }
-
-        .nav-link svg {
-            flex-shrink: 0;
-        }
-
-        /* ── Profile ── */
-        .navbar-profile {
-            position: relative;
-            flex-shrink: 0;
-        }
+        /* Profile */
+        .navbar-profile { position: relative; flex-shrink: 0; }
 
         .profile-btn {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 6px 12px 6px 6px;
+            padding: 5px 12px 5px 5px;
+            height: 44px;
             border-radius: 100px;
             border: 1.5px solid var(--border);
             background: var(--white);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
             font-family: 'Poppins', sans-serif;
         }
 
-        .profile-btn:hover {
+        .profile-btn:hover,
+        .profile-btn.open {
             border-color: var(--teal);
             box-shadow: 0 2px 8px rgba(27,107,123,0.12);
         }
@@ -168,34 +172,41 @@
         }
 
         .profile-info {
-            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+            max-width: 140px;
         }
 
         .profile-name {
             font-size: 13px;
             font-weight: 600;
             color: var(--text);
-            max-width: 120px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            line-height: 1.3;
         }
 
         .profile-kelas {
             font-size: 11px;
             color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.3;
         }
 
         .profile-chevron {
             color: var(--muted);
             transition: transform 0.2s;
+            flex-shrink: 0;
         }
 
-        .profile-btn.open .profile-chevron {
-            transform: rotate(180deg);
-        }
+        .profile-btn.open .profile-chevron { transform: rotate(180deg); }
 
-        /* ── Dropdown ── */
+        /* Dropdown */
         .profile-dropdown {
             position: absolute;
             top: calc(100% + 8px);
@@ -217,18 +228,8 @@
             border-bottom: 1px solid var(--border);
         }
 
-        .dropdown-header .d-name {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .dropdown-header .d-nis {
-            font-size: 12px;
-            color: var(--muted);
-            margin-top: 2px;
-        }
-
+        .dropdown-header .d-name  { font-size: 14px; font-weight: 700; color: var(--text); }
+        .dropdown-header .d-nis   { font-size: 12px; color: var(--muted); margin-top: 2px; }
         .dropdown-header .d-kelas {
             display: inline-block;
             margin-top: 6px;
@@ -248,41 +249,45 @@
             font-size: 13px;
             font-weight: 500;
             color: var(--text);
-            text-decoration: none;
-            transition: background 0.15s;
             cursor: pointer;
             border: none;
             background: transparent;
             width: 100%;
             font-family: 'Poppins', sans-serif;
+            transition: background 0.15s;
+            text-decoration: none;
         }
 
-        .dropdown-item:hover { background: var(--bg); }
+        .dropdown-item:hover         { background: var(--bg); }
+        .dropdown-item.danger        { color: var(--danger); }
+        .dropdown-item.danger:hover  { background: #fff5f5; }
 
-        .dropdown-item svg { stroke: var(--muted); flex-shrink: 0; }
-
-        .dropdown-item.danger { color: var(--danger); }
-        .dropdown-item.danger svg { stroke: var(--danger); }
-        .dropdown-item.danger:hover { background: #fff5f5; }
-
-        .dropdown-divider {
-            height: 1px;
-            background: var(--border);
-            margin: 4px 0;
-        }
-
-        /* ════════════════════════════
+        /* ══════════════════════════════════════════
            PAGE CONTENT
-        ════════════════════════════ */
+        ══════════════════════════════════════════ */
         .page-content {
             max-width: 1200px;
             margin: 0 auto;
             padding: 36px 32px;
         }
 
-        /* ════════════════════════════
-           HOME PAGE
-        ════════════════════════════ */
+        /* ══════════════════════════════════════════
+           ALERTS
+        ══════════════════════════════════════════ */
+        .alert {
+            padding: 13px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-danger  { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* ══════════════════════════════════════════
+           HERO BANNER
+        ══════════════════════════════════════════ */
         .hero-banner {
             background: linear-gradient(135deg, var(--teal) 0%, #0f4a56 100%);
             border-radius: 20px;
@@ -300,6 +305,7 @@
             width: 200px; height: 200px;
             background: rgba(255,255,255,0.05);
             border-radius: 50%;
+            pointer-events: none;
         }
 
         .hero-banner::after {
@@ -309,26 +315,12 @@
             width: 160px; height: 160px;
             background: rgba(255,255,255,0.04);
             border-radius: 50%;
+            pointer-events: none;
         }
 
-        .hero-greeting {
-            font-size: 13px;
-            color: rgba(255,255,255,0.65);
-            margin-bottom: 6px;
-            font-weight: 500;
-        }
-
-        .hero-name {
-            font-size: 26px;
-            font-weight: 800;
-            color: #fff;
-            margin-bottom: 4px;
-        }
-
-        .hero-sub {
-            font-size: 13px;
-            color: rgba(255,255,255,0.6);
-        }
+        .hero-greeting { font-size: 13px; color: rgba(255,255,255,0.65); margin-bottom: 6px; font-weight: 500; }
+        .hero-name     { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 4px; }
+        .hero-sub      { font-size: 13px; color: rgba(255,255,255,0.6); }
 
         .hero-badge {
             display: inline-flex;
@@ -344,67 +336,9 @@
             margin-top: 14px;
         }
 
-        /* ── Stat Cards ── */
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 28px;
-        }
-
-        .stat-card {
-            background: var(--white);
-            border-radius: 16px;
-            padding: 22px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.09);
-        }
-
-        .stat-icon {
-            width: 50px; height: 50px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .stat-icon.teal   { background: var(--teal-light); }
-        .stat-icon.teal svg   { stroke: var(--teal); }
-        .stat-icon.yellow { background: #fff8e1; }
-        .stat-icon.yellow svg { stroke: #d4a017; }
-        .stat-icon.green  { background: #eafaf1; }
-        .stat-icon.green svg  { stroke: var(--success); }
-
-        .stat-label {
-            font-size: 12px;
-            color: var(--muted);
-            font-weight: 500;
-        }
-
-        .stat-value {
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--text);
-            line-height: 1.2;
-            margin-top: 2px;
-        }
-
-        .stat-sub {
-            font-size: 11px;
-            color: var(--muted);
-            margin-top: 2px;
-        }
-
-        /* ── Section Heading ── */
+        /* ══════════════════════════════════════════
+           SECTION HEADING
+        ══════════════════════════════════════════ */
         .section-heading {
             display: flex;
             align-items: center;
@@ -412,17 +346,12 @@
             margin-bottom: 16px;
         }
 
-        .section-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text);
-        }
+        .section-title { font-size: 16px; font-weight: 700; color: var(--text); }
 
         .section-link {
             font-size: 13px;
             color: var(--teal);
             font-weight: 600;
-            text-decoration: none;
             cursor: pointer;
             border: none;
             background: transparent;
@@ -431,7 +360,9 @@
 
         .section-link:hover { text-decoration: underline; }
 
-        /* ── Kantin Cards ── */
+        /* ══════════════════════════════════════════
+           KANTIN GRID
+        ══════════════════════════════════════════ */
         .kantin-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -444,15 +375,24 @@
             border-radius: 16px;
             padding: 20px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-            transition: all 0.2s;
-            cursor: pointer;
+            transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
             border: 2px solid transparent;
+            display: block;
+            color: inherit;
         }
 
         .kantin-card:hover {
             border-color: var(--teal);
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(27,107,123,0.12);
+        }
+
+        /* Kantin tutup */
+        .kantin-card.tutup {
+            opacity: 0.55;
+            cursor: not-allowed;
+            pointer-events: none;
+            border: 2px dashed #ddd;
         }
 
         .kantin-icon {
@@ -465,20 +405,10 @@
             margin-bottom: 12px;
         }
 
-        .kantin-icon svg { stroke: var(--teal); }
-
-        .kantin-name {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text);
-            margin-bottom: 4px;
-        }
-
-        .kantin-lokasi {
-            font-size: 12px;
-            color: var(--muted);
-            margin-bottom: 10px;
-        }
+        .kantin-icon svg   { stroke: var(--teal); }
+        .kantin-name       { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+        .kantin-lokasi     { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+        .kantin-tutup-info { font-size: 11px; color: var(--muted); margin-top: 6px; }
 
         .kantin-status {
             display: inline-flex;
@@ -490,26 +420,13 @@
             border-radius: 100px;
         }
 
-        .kantin-status.buka {
-            background: #eafaf1;
-            color: var(--success);
-        }
+        .status-buka  { background: #eafaf1; color: var(--success); }
+        .status-buka::before  { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+        .status-tutup { background: #f8f8f8; color: var(--muted); }
 
-        .kantin-status.tutup {
-            background: #f8f8f8;
-            color: var(--muted);
-        }
-
-        .kantin-status.buka::before {
-            content: '';
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: var(--success);
-        }
-
-        /* ════════════════════════════
-           PESANAN & RIWAYAT
-        ════════════════════════════ */
+        /* ══════════════════════════════════════════
+           CARD & TABLE
+        ══════════════════════════════════════════ */
         .card {
             background: var(--white);
             border-radius: 16px;
@@ -526,13 +443,8 @@
             justify-content: space-between;
         }
 
-        .card-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text);
-        }
+        .card-title { font-size: 15px; font-weight: 700; color: var(--text); }
 
-        /* ── Table ── */
         .table-wrap { overflow-x: auto; }
 
         table { width: 100%; border-collapse: collapse; }
@@ -554,12 +466,15 @@
             font-size: 13px;
             color: var(--text);
             border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
         }
 
         tbody tr:last-child td { border-bottom: none; }
         tbody tr:hover { background: #fafcfc; }
 
-        /* ── Badge ── */
+        /* ══════════════════════════════════════════
+           BADGES
+        ══════════════════════════════════════════ */
         .badge {
             display: inline-flex;
             align-items: center;
@@ -574,7 +489,6 @@
         .badge-ready      { background: #d4edda; color: #155724; }
         .badge-picked     { background: #e2e3e5; color: #383d41; }
 
-        /* ── Antrean badge ── */
         .antrean-badge {
             background: var(--teal);
             color: #fff;
@@ -585,45 +499,17 @@
             display: inline-block;
         }
 
-        /* ── Empty state ── */
-        .empty-state {
-            text-align: center;
-            padding: 48px 20px;
-            color: var(--muted);
-        }
+        /* ══════════════════════════════════════════
+           EMPTY STATE
+        ══════════════════════════════════════════ */
+        .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); }
+        .empty-state .empty-icon { margin-bottom: 12px; display: flex; justify-content: center; color: #ccc; }
+        .empty-state p    { font-size: 14px; margin-bottom: 4px; font-weight: 500; color: #555; }
+        .empty-state span { font-size: 12px; color: var(--muted); }
 
-        .empty-state .empty-icon {
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: center;
-            color: #ccc;
-        }
-
-        .empty-state p {
-            font-size: 14px;
-            margin-bottom: 4px;
-            font-weight: 500;
-            color: #555;
-        }
-
-        .empty-state span {
-            font-size: 12px;
-            color: var(--muted);
-        }
-
-        /* ── Alert ── */
-        .alert {
-            padding: 13px 18px;
-            border-radius: 12px;
-            font-size: 13px;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-
-        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .alert-danger  { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-
-        /* ── Tab bar ── */
+        /* ══════════════════════════════════════════
+           TAB BAR
+        ══════════════════════════════════════════ */
         .tab-bar {
             display: flex;
             gap: 4px;
@@ -644,7 +530,7 @@
             font-weight: 500;
             color: var(--muted);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
         }
 
         .tab-btn.active {
@@ -654,49 +540,59 @@
             box-shadow: 0 1px 4px rgba(0,0,0,0.08);
         }
 
-        /* ── Page header ── */
-        .page-header {
-            margin-bottom: 24px;
+        /* ══════════════════════════════════════════
+           PAGE HEADER
+        ══════════════════════════════════════════ */
+        .page-header   { margin-bottom: 24px; }
+        .page-title    { font-size: 22px; font-weight: 800; color: var(--text); }
+        .page-subtitle { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+        /* ══════════════════════════════════════════
+           RESPONSIVE
+        ══════════════════════════════════════════ */
+        @media (max-width: 900px) {
+            .kantin-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
-        .page-title {
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--text);
-        }
-
-        .page-subtitle {
-            font-size: 13px;
-            color: var(--muted);
-            margin-top: 3px;
-        }
-
-        /* ── Responsive ── */
         @media (max-width: 768px) {
-            .navbar-inner { padding: 0 16px; }
+            .navbar-inner { padding: 0 16px; gap: 12px; }
             .page-content { padding: 24px 16px; }
-            .stat-grid    { grid-template-columns: 1fr 1fr; }
             .kantin-grid  { grid-template-columns: 1fr; }
+            .hero-banner  { padding: 24px 24px; }
+            .hero-name    { font-size: 20px; }
             .profile-info { display: none; }
-            .navbar-nav   { gap: 0; }
+
             .nav-link span { display: none; }
+            .nav-link      { padding: 8px 10px; }
+
+            .tab-bar { width: 100%; overflow-x: auto; }
+        }
+
+        @media (max-width: 480px) {
+            .navbar-nav { gap: 0; }
         }
     </style>
 </head>
 <body>
 
-{{-- ════════════════════════════════
+{{-- ══════════════════════════════════════════════════
      NAVBAR
-════════════════════════════════ --}}
+══════════════════════════════════════════════════ --}}
 <nav class="navbar">
     <div class="navbar-inner">
 
-        {{-- Logo --}}
+        {{-- Brand --}}
         <a class="navbar-brand" href="#" onclick="showPage('home')">
             <div class="brand-logo">
-                <img src="{{ asset('images/logo.png') }}" 
-                    alt="Logo KantinKu" 
-                    style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
+                @if(file_exists(public_path('images/logo.png')))
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo KantinKu">
+                @else
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/>
+                        <path d="M7 2v20"/>
+                        <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
+                    </svg>
+                @endif
             </div>
             <span class="brand-text">Kantin<span>Ku</span></span>
         </a>
@@ -704,31 +600,20 @@
         {{-- Nav Links --}}
         <div class="navbar-nav">
             <button class="nav-link active" id="nav-home" onclick="showPage('home')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                    <polyline points="9 22 9 12 15 12 15 22"/>
-                </svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                 <span>Home</span>
             </button>
             <button class="nav-link" id="nav-pesanan" onclick="showPage('pesanan')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-                    <rect x="9" y="3" width="6" height="4" rx="2"/>
-                    <line x1="9" y1="12" x2="15" y2="12"/>
-                    <line x1="9" y1="16" x2="13" y2="16"/>
-                </svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
                 <span>Pesanan Saya</span>
             </button>
             <button class="nav-link" id="nav-riwayat" onclick="showPage('riwayat')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polyline points="12 6 12 12 16 14"/>
-                </svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 <span>Riwayat</span>
             </button>
         </div>
 
-        {{-- Profile --}}
+        {{-- Profile Dropdown --}}
         <div class="navbar-profile">
             <button class="profile-btn" id="profileBtn" onclick="toggleDropdown()">
                 <div class="profile-avatar">
@@ -749,10 +634,21 @@
                     <div class="d-nis">NIS: {{ auth('web')->user()->nis }}</div>
                     <span class="d-kelas">{{ auth('web')->user()->kelas ?? '-' }}</span>
                 </div>
+
+                {{-- Link Profil Saya --}}
+                <a href="{{ route('siswa.profile') }}" class="dropdown-item">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Profil Saya
+                </a>
+
+                {{-- Logout --}}
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="dropdown-item danger">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                             <polyline points="16 17 21 12 16 7"/>
                             <line x1="21" y1="12" x2="9" y2="12"/>
@@ -766,11 +662,12 @@
     </div>
 </nav>
 
-{{-- ════════════════════════════════
-     PAGE CONTENT
-════════════════════════════════ --}}
+{{-- ══════════════════════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════════════════════ --}}
 <div class="page-content">
 
+    {{-- Flash Messages --}}
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
@@ -778,10 +675,12 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
-    {{-- ══ PAGE: HOME ══ --}}
+    {{-- ════════════════════════════
+         PAGE: HOME
+    ════════════════════════════ --}}
     <div id="page-home">
 
-        {{-- Hero --}}
+        {{-- Hero Banner --}}
         <div class="hero-banner">
             <div class="hero-greeting">Selamat datang kembali,</div>
             <div class="hero-name">{{ auth('web')->user()->nama_lengkap }}</div>
@@ -795,18 +694,20 @@
             </div>
         </div>
 
-        {{-- Daftar Kantin --}}
+        {{-- Kantin List --}}
         <div class="section-heading">
             <div class="section-title">Kantin Tersedia</div>
         </div>
 
         <div class="kantin-grid">
             @forelse($kantinList ?? [] as $kantin)
+
                 @if($kantin->status_operasional === 'buka')
-                <a href="{{ route('siswa.pilih.menu', $kantin->id) }}" class="kantin-card" style="text-decoration:none; display:block;">
+                    <a href="{{ route('siswa.pilih.menu', $kantin->id) }}" class="kantin-card">
                 @else
-                <div class="kantin-card tutup">
+                    <div class="kantin-card tutup">
                 @endif
+
                     <div class="kantin-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/>
@@ -814,28 +715,41 @@
                             <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
                         </svg>
                     </div>
+
                     <div class="kantin-name">{{ $kantin->nama_kantinn }}</div>
-                    <span class="kantin-status {{ $kantin->status_operasional }}">
-                        {{ $kantin->status_operasional === 'buka' ? 'Sedang Buka' : 'Tutup' }}
+
+                    @if($kantin->lokasi)
+                        <div class="kantin-lokasi">{{ $kantin->lokasi }}</div>
+                    @endif
+
+                    <span class="kantin-status {{ $kantin->status_operasional === 'buka' ? 'status-buka' : 'status-tutup' }}">
+                        {{ $kantin->status_operasional === 'buka' ? 'Sedang Buka' : 'Sedang Tutup' }}
                     </span>
+
+                    @if($kantin->status_operasional === 'tutup')
+                        <div class="kantin-tutup-info">🚫 Tidak menerima pesanan</div>
+                    @endif
+
                 @if($kantin->status_operasional === 'buka')
-                </a>
+                    </a>
                 @else
-                </div>
-                @endif
-            @empty
-            <div style="grid-column: 1/-1">
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/>
-                            <path d="M7 2v20"/>
-                            <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
-                        </svg>
                     </div>
-                    <p>Belum ada kantin tersedia</p>
+                @endif
+
+            @empty
+                <div style="grid-column: 1 / -1;">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/>
+                                <path d="M7 2v20"/>
+                                <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
+                            </svg>
+                        </div>
+                        <p>Belum ada kantin tersedia</p>
+                        <span>Mohon tunggu hingga kantin dibuka</span>
+                    </div>
                 </div>
-            </div>
             @endforelse
         </div>
 
@@ -859,42 +773,53 @@
                     </thead>
                     <tbody>
                         @forelse($pesananTerbaru ?? [] as $p)
-                        <tr>
-                            <td><span class="antrean-badge">#{{ str_pad($p->nomor_antrean, 3, '0', STR_PAD_LEFT) }}</span></td>
-                            <td>{{ $p->kantin->nama_kantinn ?? '-' }}</td>
-                            <td style="font-weight:700">Rp {{ number_format($p->total_harga, 0, ',', '.') }}</td>
-                            <td style="color:var(--muted); font-size:12px">{{ $p->created_at->format('H:i') }}</td>
-                            <td>
-                                @php
-                                    $cls = match($p->status) { 'pending'=>'badge-pending','processing'=>'badge-processing','ready'=>'badge-ready','picked'=>'badge-picked',default=>'badge-pending'};
-                                    $lbl = match($p->status) { 'pending'=>'Menunggu','processing'=>'Diproses','ready'=>'Siap Diambil','picked'=>'Sudah Diambil',default=>$p->status};
-                                @endphp
-                                <span class="badge {{ $cls }}">{{ $lbl }}</span>
-                            </td>
-                        </tr>
+                            @php
+                                $cls = match($p->status) {
+                                    'pending'    => 'badge-pending',
+                                    'processing' => 'badge-processing',
+                                    'ready'      => 'badge-ready',
+                                    'picked'     => 'badge-picked',
+                                    default      => 'badge-pending',
+                                };
+                                $lbl = match($p->status) {
+                                    'pending'    => 'Menunggu',
+                                    'processing' => 'Diproses',
+                                    'ready'      => 'Siap Diambil',
+                                    'picked'     => 'Sudah Diambil',
+                                    default      => ucfirst($p->status),
+                                };
+                            @endphp
+                            <tr>
+                                <td><span class="antrean-badge">#{{ str_pad($p->nomor_antrean, 3, '0', STR_PAD_LEFT) }}</span></td>
+                                <td>{{ $p->kantin->nama_kantinn ?? '-' }}</td>
+                                <td style="font-weight: 700">Rp {{ number_format($p->total_harga, 0, ',', '.') }}</td>
+                                <td style="color: var(--muted); font-size: 12px">{{ $p->created_at->format('H:i') }}</td>
+                                <td><span class="badge {{ $cls }}">{{ $lbl }}</span></td>
+                            </tr>
                         @empty
-                        <tr><td colspan="5">
-                            <div class="empty-state">
-                                <div class="empty-icon">
-                                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
-                                        <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
-                                    </svg>
-                                </div>
-                                <p>Belum ada pesanan</p>
-                                <span>Pesanan kamu akan muncul di sini</span>
-                            </div>
-                        </td></tr>
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <div class="empty-icon">
+                                            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+                                        </div>
+                                        <p>Belum ada pesanan</p>
+                                        <span>Pesanan kamu akan muncul di sini</span>
+                                    </div>
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
 
-    </div>
+    </div>{{-- end #page-home --}}
 
-    {{-- ══ PAGE: PESANAN SAYA ══ --}}
-    <div id="page-pesanan" style="display:none">
+    {{-- ════════════════════════════
+         PAGE: PESANAN SAYA
+    ════════════════════════════ --}}
+    <div id="page-pesanan" style="display: none">
 
         <div class="page-header">
             <div class="page-title">Pesanan Saya</div>
@@ -923,46 +848,58 @@
                     </thead>
                     <tbody>
                         @forelse($pesananAktifList ?? [] as $p)
-                        <tr data-status="{{ $p->status }}">
-                            <td><span class="antrean-badge">#{{ str_pad($p->nomor_antrean, 3, '0', STR_PAD_LEFT) }}</span></td>
-                            <td>{{ $p->kantin->nama_kantinn ?? '-' }}</td>
-                            <td style="font-size:12px; max-width:160px">
-                                @foreach($p->detailPesanan as $d)
-                                    <div>{{ $d->menu->nama_menu ?? '-' }} <span style="color:var(--muted)">x{{ $d->jumlah }}</span></div>
-                                @endforeach
-                            </td>
-                            <td style="font-weight:700">Rp {{ number_format($p->total_harga, 0, ',', '.') }}</td>
-                            <td style="color:var(--muted); font-size:12px">{{ $p->created_at->format('d/m H:i') }}</td>
-                            <td>
-                                @php
-                                    $cls = match($p->status) { 'pending'=>'badge-pending','processing'=>'badge-processing','ready'=>'badge-ready','picked'=>'badge-picked',default=>'badge-pending'};
-                                    $lbl = match($p->status) { 'pending'=>'Menunggu','processing'=>'Diproses','ready'=>'Siap Diambil','picked'=>'Sudah Diambil',default=>$p->status};
-                                @endphp
-                                <span class="badge {{ $cls }}">{{ $lbl }}</span>
-                            </td>
-                        </tr>
+                            @php
+                                $cls = match($p->status) {
+                                    'pending'    => 'badge-pending',
+                                    'processing' => 'badge-processing',
+                                    'ready'      => 'badge-ready',
+                                    'picked'     => 'badge-picked',
+                                    default      => 'badge-pending',
+                                };
+                                $lbl = match($p->status) {
+                                    'pending'    => 'Menunggu',
+                                    'processing' => 'Diproses',
+                                    'ready'      => 'Siap Diambil',
+                                    'picked'     => 'Sudah Diambil',
+                                    default      => ucfirst($p->status),
+                                };
+                            @endphp
+                            <tr data-status="{{ $p->status }}">
+                                <td><span class="antrean-badge">#{{ str_pad($p->nomor_antrean, 3, '0', STR_PAD_LEFT) }}</span></td>
+                                <td>{{ $p->kantin->nama_kantinn ?? '-' }}</td>
+                                <td style="font-size: 12px; max-width: 160px">
+                                    @foreach($p->detailPesanan as $d)
+                                        <div>{{ $d->menu->nama_menu ?? '-' }} <span style="color: var(--muted)">x{{ $d->jumlah }}</span></div>
+                                    @endforeach
+                                </td>
+                                <td style="font-weight: 700">Rp {{ number_format($p->total_harga, 0, ',', '.') }}</td>
+                                <td style="color: var(--muted); font-size: 12px">{{ $p->created_at->format('d/m H:i') }}</td>
+                                <td><span class="badge {{ $cls }}">{{ $lbl }}</span></td>
+                            </tr>
                         @empty
-                        <tr><td colspan="6">
-                            <div class="empty-state">
-                                <div class="empty-icon">
-                                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-                                        <rect x="9" y="3" width="6" height="4" rx="2"/>
-                                    </svg>
-                                </div>
-                                <p>Tidak ada pesanan aktif</p>
-                                <span>Pesanan yang sedang berjalan akan tampil di sini</span>
-                            </div>
-                        </td></tr>
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <div class="empty-icon">
+                                            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/></svg>
+                                        </div>
+                                        <p>Tidak ada pesanan aktif</p>
+                                        <span>Pesanan yang sedang berjalan akan tampil di sini</span>
+                                    </div>
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
 
-    {{-- ══ PAGE: RIWAYAT ══ --}}
-    <div id="page-riwayat" style="display:none">
+    </div>{{-- end #page-pesanan --}}
+
+    {{-- ════════════════════════════
+         PAGE: RIWAYAT
+    ════════════════════════════ --}}
+    <div id="page-riwayat" style="display: none">
 
         <div class="page-header">
             <div class="page-title">Riwayat Pesanan</div>
@@ -984,54 +921,68 @@
                     </thead>
                     <tbody>
                         @forelse($riwayatPesanan ?? [] as $p)
-                        <tr>
-                            <td><span class="antrean-badge">#{{ str_pad($p->nomor_antrean, 3, '0', STR_PAD_LEFT) }}</span></td>
-                            <td>{{ $p->kantin->nama_kantinn ?? '-' }}</td>
-                            <td style="font-size:12px; max-width:160px">
-                                @foreach($p->detailPesanan as $d)
-                                    <div>{{ $d->menu->nama_menu ?? '-' }} <span style="color:var(--muted)">x{{ $d->jumlah }}</span></div>
-                                @endforeach
-                            </td>
-                            <td style="font-weight:700">Rp {{ number_format($p->total_harga, 0, ',', '.') }}</td>
-                            <td style="color:var(--muted); font-size:12px">{{ $p->created_at->format('d/m/Y H:i') }}</td>
-                            <td>
-                                @php
-                                    $cls = match($p->status) { 'pending'=>'badge-pending','processing'=>'badge-processing','ready'=>'badge-ready','picked'=>'badge-picked',default=>'badge-pending'};
-                                    $lbl = match($p->status) { 'pending'=>'Menunggu','processing'=>'Diproses','ready'=>'Siap Diambil','picked'=>'Sudah Diambil',default=>$p->status};
-                                @endphp
-                                <span class="badge {{ $cls }}">{{ $lbl }}</span>
-                            </td>
-                        </tr>
+                            @php
+                                $cls = match($p->status) {
+                                    'pending'    => 'badge-pending',
+                                    'processing' => 'badge-processing',
+                                    'ready'      => 'badge-ready',
+                                    'picked'     => 'badge-picked',
+                                    default      => 'badge-pending',
+                                };
+                                $lbl = match($p->status) {
+                                    'pending'    => 'Menunggu',
+                                    'processing' => 'Diproses',
+                                    'ready'      => 'Siap Diambil',
+                                    'picked'     => 'Sudah Diambil',
+                                    default      => ucfirst($p->status),
+                                };
+                            @endphp
+                            <tr>
+                                <td><span class="antrean-badge">#{{ str_pad($p->nomor_antrean, 3, '0', STR_PAD_LEFT) }}</span></td>
+                                <td>{{ $p->kantin->nama_kantinn ?? '-' }}</td>
+                                <td style="font-size: 12px; max-width: 160px">
+                                    @foreach($p->detailPesanan as $d)
+                                        <div>{{ $d->menu->nama_menu ?? '-' }} <span style="color: var(--muted)">x{{ $d->jumlah }}</span></div>
+                                    @endforeach
+                                </td>
+                                <td style="font-weight: 700">Rp {{ number_format($p->total_harga, 0, ',', '.') }}</td>
+                                <td style="color: var(--muted); font-size: 12px">{{ $p->created_at->format('d/m/Y H:i') }}</td>
+                                <td><span class="badge {{ $cls }}">{{ $lbl }}</span></td>
+                            </tr>
                         @empty
-                        <tr><td colspan="6">
-                            <div class="empty-state">
-                                <div class="empty-icon">
-                                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <polyline points="12 6 12 12 16 14"/>
-                                    </svg>
-                                </div>
-                                <p>Belum ada riwayat pesanan</p>
-                                <span>Riwayat pesanan kamu akan muncul di sini</span>
-                            </div>
-                        </td></tr>
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <div class="empty-icon">
+                                            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                        </div>
+                                        <p>Belum ada riwayat pesanan</p>
+                                        <span>Riwayat pesanan kamu akan muncul di sini</span>
+                                    </div>
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
 
-</div>
+    </div>{{-- end #page-riwayat --}}
+
+</div>{{-- end .page-content --}}
 
 <script>
-    // ── Navigasi halaman ──
+    /* ══════════════════════════════════════════
+       PAGE NAVIGATION
+    ══════════════════════════════════════════ */
+    const pages = ['home', 'pesanan', 'riwayat'];
+
     function showPage(page) {
-        ['home', 'pesanan', 'riwayat'].forEach(p => {
-            document.getElementById('page-' + p).style.display = p === page ? 'block' : 'none';
+        pages.forEach(function(p) {
+            document.getElementById('page-' + p).style.display = (p === page) ? 'block' : 'none';
         });
 
-        document.querySelectorAll('.nav-link').forEach(el => {
+        document.querySelectorAll('.nav-link').forEach(function(el) {
             el.classList.remove('active');
         });
 
@@ -1041,12 +992,12 @@
         closeDropdown();
     }
 
-    // ── Profile dropdown ──
+    /* ══════════════════════════════════════════
+       PROFILE DROPDOWN
+    ══════════════════════════════════════════ */
     function toggleDropdown() {
-        const dropdown = document.getElementById('profileDropdown');
-        const btn      = document.getElementById('profileBtn');
-        dropdown.classList.toggle('open');
-        btn.classList.toggle('open');
+        document.getElementById('profileDropdown').classList.toggle('open');
+        document.getElementById('profileBtn').classList.toggle('open');
     }
 
     function closeDropdown() {
@@ -1054,36 +1005,36 @@
         document.getElementById('profileBtn').classList.remove('open');
     }
 
-    // Tutup dropdown kalau klik di luar
+    // Tutup dropdown jika klik di luar
     document.addEventListener('click', function(e) {
         const profile = document.querySelector('.navbar-profile');
         if (!profile.contains(e.target)) closeDropdown();
     });
 
-    // ── Filter status pesanan ──
+    /* ══════════════════════════════════════════
+       TAB FILTER PESANAN
+    ══════════════════════════════════════════ */
     function filterStatus(status, btn) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(function(b) {
+            b.classList.remove('active');
+        });
         btn.classList.add('active');
-        document.querySelectorAll('tbody tr[data-status]').forEach(row => {
+
+        document.querySelectorAll('tbody tr[data-status]').forEach(function(row) {
             row.style.display = (status === 'semua' || row.dataset.status === status) ? '' : 'none';
         });
     }
 
-    // ============================================================
-    // ⭐ AUTO HIDE ALERT NOTIFIKASI SETELAH 3 DETIK ⭐
-    // ============================================================
+    /* ══════════════════════════════════════════
+       AUTO DISMISS ALERTS
+    ══════════════════════════════════════════ */
     document.addEventListener('DOMContentLoaded', function() {
-        const alerts = document.querySelectorAll('.alert-success, .alert-danger');
-        
-        alerts.forEach(function(alert) {
+        document.querySelectorAll('.alert-success, .alert-danger').forEach(function(alert) {
             setTimeout(function() {
                 alert.style.transition = 'opacity 0.5s ease';
-                alert.style.opacity = '0';
-                
-                setTimeout(function() {
-                    alert.remove();
-                }, 500);
-            }, 3000); // 3 detik
+                alert.style.opacity    = '0';
+                setTimeout(function() { alert.remove(); }, 500);
+            }, 3000);
         });
     });
 </script>

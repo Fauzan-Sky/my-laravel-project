@@ -2,10 +2,10 @@
 @section('title', 'Masuk')
 
 @push('styles')
-{{-- Google Fonts --}}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
     * {
@@ -65,6 +65,16 @@
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     }
 
+    .brand-tagline {
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 14px;
+        font-weight: 400;
+        text-align: center;
+        margin-top: 16px;
+        line-height: 1.7;
+        max-width: 260px;
+    }
+
     /* ═════════════════════════════════════ */
     /*            PANEL KANAN                 */
     /* ═════════════════════════════════════ */
@@ -108,11 +118,12 @@
     /* ═════════════════════════════════════ */
     .input-group {
         margin-bottom: 24px;
+        position: relative;
     }
 
     .input-field {
         width: 100%;
-        padding: 16px 0 12px 0;
+        padding: 16px 40px 12px 0;
         border: none;
         border-bottom: 2px solid #e0e0e0;
         background: transparent;
@@ -149,6 +160,50 @@
         display: block;
         font-weight: 500;
         padding-left: 4px;
+    }
+
+    /* ═════════════════════════════════════ */
+    /*         TOGGLE PASSWORD                */
+    /* ═════════════════════════════════════ */
+    .toggle-password {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-60%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #aaa;
+        font-size: 16px;
+        padding: 4px;
+        transition: color 0.3s ease;
+        outline: none;
+    }
+
+    .toggle-password:hover {
+        color: #1B6B7B;
+    }
+
+    /* ═════════════════════════════════════ */
+    /*         LUPA PASSWORD                  */
+    /* ═════════════════════════════════════ */
+    .forgot-password {
+        text-align: right;
+        margin-top: -12px;
+        margin-bottom: 8px;
+    }
+
+    .forgot-password a {
+        color: #1B6B7B;
+        font-size: 12px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .forgot-password a:hover {
+        color: #0f4a56;
+        text-decoration: underline;
     }
 
     /* ═════════════════════════════════════ */
@@ -199,6 +254,10 @@
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow: 0 4px 12px rgba(27, 107, 123, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
     }
 
     .btn-login:hover {
@@ -207,41 +266,10 @@
         box-shadow: 0 8px 20px rgba(27, 107, 123, 0.4);
     }
 
-    /* ═════════════════════════════════════ */
-    /*         LINK PENJUAL                   */
-    /* ═════════════════════════════════════ */
-    .seller-link {
-        text-align: center;
-        margin-top: 28px;
-        padding-top: 20px;
-        border-top: 1px solid #eee;
-    }
-
-    .seller-link a {
-        color: #1B6B7B;
-        font-size: 15px;
-        font-weight: 600;
-        text-decoration: none;
-        cursor: pointer;
-        transition: color 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .seller-link a:hover {
-        color: #0f4a56;
-        text-decoration: underline;
-    }
-
-    .seller-link a::after {
-        content: '→';
-        font-size: 18px;
-        transition: transform 0.3s ease;
-    }
-
-    .seller-link a:hover::after {
-        transform: translateX(4px);
+    .btn-login:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
     }
 
     /* ═════════════════════════════════════ */
@@ -259,14 +287,8 @@
     }
 
     @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .alert-success {
@@ -299,6 +321,35 @@
     }
 
     /* ═════════════════════════════════════ */
+    /*    MOBILE HEADER (pengganti left panel) */
+    /* ═════════════════════════════════════ */
+    .mobile-header {
+        display: none;
+        background: #1B6B7B;
+        padding: 32px 24px;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .mobile-header img {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+    }
+
+    .mobile-header .brand-name {
+        font-size: 26px;
+    }
+
+    .mobile-header .brand-tagline {
+        font-size: 13px;
+        margin-top: 4px;
+    }
+
+    /* ═════════════════════════════════════ */
     /*              RESPONSIVE                 */
     /* ═════════════════════════════════════ */
     @media (max-width: 1024px) {
@@ -310,25 +361,31 @@
     @media (max-width: 768px) {
         .login-wrapper {
             grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr;
         }
-        
+
         .left-panel {
             display: none;
         }
-        
+
+        .mobile-header {
+            display: flex;
+        }
+
         .right-panel {
             padding: 40px 24px;
+            justify-content: flex-start;
         }
-        
+
         .form-container {
             max-width: 100%;
         }
-        
+
         .btn-row {
             flex-direction: column;
             gap: 12px;
         }
-        
+
         .btn-daftar,
         .btn-login {
             width: 100%;
@@ -336,15 +393,28 @@
     }
 
     @media (max-width: 480px) {
+        .mobile-header {
+            padding: 24px 20px;
+        }
+
+        .mobile-header img {
+            width: 64px;
+            height: 64px;
+        }
+
+        .mobile-header .brand-name {
+            font-size: 22px;
+        }
+
         .right-panel {
-            padding: 32px 20px;
+            padding: 28px 20px;
         }
-        
+
         .form-title {
-            font-size: 28px;
-            margin-bottom: 32px;
+            font-size: 26px;
+            margin-bottom: 28px;
         }
-        
+
         .form-title::after {
             width: 50px;
         }
@@ -353,6 +423,14 @@
 @endpush
 
 @section('content')
+
+{{-- MOBILE HEADER — hanya tampil di layar kecil --}}
+<div class="mobile-header">
+    <img src="{{ asset('images/logo.png') }}" alt="Logo KantinKu">
+    <div class="brand-name">KantinKu</div>
+    <p class="brand-tagline">Platform pemesanan makanan & minuman kantin sekolah yang mudah, cepat, dan praktis.</p>
+</div>
+
 <div class="login-wrapper">
 
     {{-- ═════════════════════════════════════ --}}
@@ -363,6 +441,7 @@
              alt="Logo KantinKu" 
              class="logo-image">
         <div class="brand-name">KantinKu</div>
+        <p class="brand-tagline">Platform pemesanan makanan & minuman kantin sekolah yang mudah, cepat, dan praktis.</p>
     </div>
 
     {{-- ═════════════════════════════════════ --}}
@@ -371,7 +450,6 @@
     <div class="right-panel">
         <div class="form-container">
             
-            {{-- Judul Form --}}
             <h1 class="form-title">Login</h1>
 
             {{-- Flash Messages --}}
@@ -390,7 +468,7 @@
             @endif
 
             {{-- Form Login --}}
-            <form method="POST" action="{{ route('login.post') }}" autocomplete="off">
+            <form method="POST" action="{{ route('login.post') }}">
                 @csrf
                 <input type="hidden" name="role" value="siswa">
 
@@ -420,6 +498,9 @@
                            id="password"
                            class="input-field {{ $errors->has('password') ? 'is-invalid' : '' }}"
                            placeholder="Password">
+                    <button type="button" class="toggle-password" onclick="togglePassword()">
+                        <i class="fas fa-eye" id="toggleIcon"></i>
+                    </button>
                     @error('password')
                         <span class="error-text">
                             <i class="fas fa-exclamation-triangle" style="margin-right: 4px;"></i>
@@ -428,15 +509,20 @@
                     @enderror
                 </div>
 
+                {{-- Lupa Password --}}
+                <div class="forgot-password">
+                    <a href="{{ route('forgot-password.index') }}">Lupa password?</a>
+                </div>
+
                 {{-- Tombol Aksi --}}
                 <div class="btn-row">
                     <a href="{{ route('register') }}" class="btn-daftar">
                         <i class="fas fa-user-plus" style="margin-right: 8px;"></i>
                         Daftar
                     </a>
-                    <button type="submit" class="btn-login">
-                        <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>
-                        Login
+                    <button type="submit" class="btn-login" id="btnLogin">
+                        <i class="fas fa-sign-in-alt" id="btnIcon"></i>
+                        <span id="btnText">Login</span>
                     </button>
                 </div>
 
@@ -449,11 +535,34 @@
 @endsection
 
 @push('scripts')
-{{-- Font Awesome untuk ikon (opsional, tambah jika belum ada) --}}
-<script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
-
 <script>
+    // Toggle show/hide password
+    function togglePassword() {
+        const input = document.getElementById('password');
+        const icon = document.getElementById('toggleIcon');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
+
+        // Loading state saat submit
+        const form = document.querySelector('form');
+        const btnLogin = document.getElementById('btnLogin');
+        const btnIcon = document.getElementById('btnIcon');
+        const btnText = document.getElementById('btnText');
+
+        form.addEventListener('submit', function() {
+            btnLogin.disabled = true;
+            btnIcon.className = 'fas fa-spinner fa-spin';
+            btnText.textContent = 'Masuk...';
+        });
+
         // Auto-hide alert setelah 5 detik
         const alerts = document.querySelectorAll('.alert');
         alerts.forEach(alert => {
@@ -462,17 +571,6 @@
                 alert.style.opacity = '0';
                 setTimeout(() => alert.remove(), 500);
             }, 5000);
-        });
-
-        // Animasi input focus
-        const inputs = document.querySelectorAll('.input-field');
-        inputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.classList.add('focused');
-            });
-            input.addEventListener('blur', function() {
-                this.parentElement.classList.remove('focused');
-            });
         });
 
         // Validasi NIS hanya angka

@@ -3,6 +3,8 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboard;
 use App\Http\Controllers\Siswa\PesananController as SiswaPesanan;
+use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
+use App\Http\Controllers\Penjual\LaporanController;
 use App\Http\Controllers\Siswa\MenuController;
 use App\Http\Controllers\Penjual\DashboardController;
 use App\Http\Controllers\Penjual\PesananController;
@@ -12,7 +14,10 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminMenuController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminUserController;
-use App\Http\Controllers\Admin\SiswaController;   // ← DITAMBAH
+use App\Http\Controllers\Admin\SiswaController;
+use App\Http\Controllers\Admin\KantinController;
+use App\Http\Controllers\Auth\ForgotPasswordSiswaController;
+use App\Http\Controllers\Siswa\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 // ══════════════════════════════════════════════════════════
@@ -41,6 +46,14 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.po
 Route::post('/logout',   [AuthController::class, 'logout'])->name('logout');
 
 // ══════════════════════════════════════════════════════════
+//  LUPA PASSWORD SISWA (publik, tanpa auth)
+// ══════════════════════════════════════════════════════════
+
+Route::get('/lupa-password',           [ForgotPasswordSiswaController::class, 'index'])->name('forgot-password.index');
+Route::post('/lupa-password/verifikasi', [ForgotPasswordSiswaController::class, 'verifikasi'])->name('forgot-password.verifikasi');
+Route::post('/lupa-password/reset',    [ForgotPasswordSiswaController::class, 'reset'])->name('forgot-password.reset');
+
+// ══════════════════════════════════════════════════════════
 //  SISWA ROUTES
 // ══════════════════════════════════════════════════════════
 
@@ -48,6 +61,10 @@ Route::middleware('auth.siswa')->prefix('siswa')->name('siswa.')->group(function
     Route::get('/dashboard',         [SiswaDashboard::class, 'index'])->name('dashboard');
     Route::get('/kantin/{id}/menu',  [MenuController::class, 'pilihMenu'])->name('pilih.menu');
     Route::post('/pesanan',          [MenuController::class, 'store'])->name('pesanan.store');
+
+    // ─── Profile ───────────────────────────────────────
+    Route::get('/profile',           [ProfileController::class, 'index'])->name('profile');
+    Route::put('/profile',           [ProfileController::class, 'update'])->name('profile.update');
 });
 
 // ══════════════════════════════════════════════════════════
@@ -56,6 +73,7 @@ Route::middleware('auth.siswa')->prefix('siswa')->name('siswa.')->group(function
 
 Route::middleware('auth.penjual')->prefix('penjual')->name('penjual.')->group(function () {
     Route::get('/dashboard',              [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/laporan',                [LaporanController::class, 'index'])->name('laporan');
     Route::patch('/pesanan/{id}/status',  [PesananController::class, 'updateStatus'])->name('pesanan.updateStatus');
     Route::patch('/stok/{id}',            [StokController::class, 'update'])->name('stok.update');
     Route::patch('/stok/{id}/available',  [StokController::class, 'toggleAvailable'])->name('stok.toggleAvailable');
@@ -82,16 +100,34 @@ Route::middleware('auth.admin')->prefix('admin')->name('admin.')->group(function
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     // ─── Kelola Siswa ──────────────────────────────────────
-    Route::resource('siswa', SiswaController::class)->except(['create', 'store', 'edit', 'update']);
-    Route::patch('siswa/{id}/toggle',         [SiswaController::class, 'toggle'])->name('siswa.toggle');
-    Route::patch('siswa/{id}/reset-password', [SiswaController::class, 'resetPassword'])->name('siswa.resetPassword');
+    Route::resource('siswa', SiswaController::class)
+        ->except(['create', 'store']);
+
+    Route::patch('siswa/{id}/toggle',
+        [SiswaController::class, 'toggle']
+    )->name('siswa.toggle');
+
+    Route::patch('siswa/{id}/reset-password',
+        [SiswaController::class, 'resetPassword']
+    )->name('siswa.reset-password');
+
+    // ─── Kelola Kantin ─────────────────────────────────────
+    Route::resource('kantin', KantinController::class);
+    Route::patch('kantin/{kantin}/toggle-status', [KantinController::class, 'toggleStatus'])->name('kantin.toggleStatus');
 
     // ─── Menu, Order, User ─────────────────────────────────
-    Route::resource('menus',  AdminMenuController::class);
-    Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
-    Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status');
-    Route::resource('users',  AdminUserController::class)->only(['index', 'show', 'destroy']);
+    Route::resource('menus', AdminMenuController::class);
+
+    Route::resource('orders', AdminOrderController::class)
+        ->only(['index', 'show', 'update']);
+
+    Route::patch('orders/{order}/status',
+        [AdminOrderController::class, 'updateStatus']
+    )->name('orders.status');
+
+    Route::resource('users', AdminUserController::class)
+        ->only(['index', 'show', 'destroy']);
 
     // ─── Laporan ───────────────────────────────────────────
-    Route::get('/laporan', [AdminDashboardController::class, 'laporan'])->name('laporan');
+    Route::get('/laporan', [AdminLaporanController::class, 'index'])->name('laporan');
 });
