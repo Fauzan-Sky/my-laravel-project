@@ -182,6 +182,36 @@
 
         @media (max-width:1100px) { .stat-grid{grid-template-columns:repeat(2,1fr)} .section-grid{grid-template-columns:1fr} }
         @media (max-width:768px)  { .sidebar{transform:translateX(-100%)} .main{margin-left:0; padding:20px 16px} .stat-grid{grid-template-columns:1fr 1fr} }
+
+        /* === MODAL === */
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; z-index:1000; padding:20px; }
+        .modal-overlay.show { display:flex; }
+        .modal-box { background:#fff; border-radius:16px; width:100%; max-width:520px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3); animation:modalIn 0.2s ease; }
+        @keyframes modalIn { from{opacity:0; transform:translateY(-20px);} to{opacity:1; transform:translateY(0);} }
+        .modal-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+        .modal-title { font-size:16px; font-weight:700; color:var(--text); }
+        .modal-close { background:none; border:none; font-size:22px; color:var(--muted); cursor:pointer; line-height:1; padding:0 4px; }
+        .modal-close:hover { color:var(--danger); }
+        .modal-body { padding:20px 24px; }
+        .modal-footer { padding:14px 24px; border-top:1px solid var(--border); display:flex; gap:10px; justify-content:flex-end; }
+
+        .form-group { margin-bottom:14px; }
+        .form-label { display:block; font-size:12px; font-weight:600; color:var(--text); margin-bottom:6px; }
+        .form-label .required { color:var(--danger); }
+        .form-control { width:100%; padding:9px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:'Poppins',sans-serif; font-size:13px; outline:none; transition:border-color 0.2s; }
+        .form-control:focus { border-color:var(--teal); }
+        textarea.form-control { resize:vertical; min-height:70px; }
+        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .form-hint { font-size:11px; color:var(--muted); margin-top:4px; }
+        .btn-danger { background:var(--danger); color:#fff; }
+        .btn-danger:hover { background:#c0392b; }
+        .btn-icon { padding:6px 8px; border-radius:6px; background:transparent; border:1px solid var(--border); cursor:pointer; transition:all 0.15s; display:inline-flex; align-items:center; justify-content:center; }
+        .btn-icon:hover { background:#f5f5f5; }
+        .btn-icon.btn-icon-danger:hover { background:#fef0ee; border-color:var(--danger); }
+        .btn-icon.btn-icon-danger:hover svg { stroke:var(--danger); }
+
+        .btn-add-menu { display:inline-flex; align-items:center; gap:8px; padding:10px 18px; background:var(--teal); color:#fff; border:none; border-radius:10px; font-family:'Poppins',sans-serif; font-size:13px; font-weight:600; cursor:pointer; transition:background 0.2s; }
+        .btn-add-menu:hover { background:var(--teal-dark); }
     </style>
 </head>
 <body>
@@ -440,15 +470,29 @@
 
     {{-- PAGE: MANAJEMEN STOK --}}
     <div id="page-stok" style="display:none">
-        <div class="page-header">
-            <div class="page-title">Manajemen Stok</div>
-            <div class="page-subtitle">Kelola stok dan ketersediaan menu</div>
+        <div class="page-header" style="display:flex; align-items:center; justify-content:space-between;">
+            <div>
+                <div class="page-title">Manajemen Stok</div>
+                <div class="page-subtitle">Kelola stok dan ketersediaan menu</div>
+            </div>
+            <button type="button" class="btn-add-menu" onclick="openModalTambah()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Tambah Menu
+            </button>
         </div>
+
+        @if($errors->any())
+            <div class="alert alert-danger">
+                @foreach($errors->all() as $error)
+                    <div>{{ $error }}</div>
+                @endforeach
+            </div>
+        @endif
 
         <div class="card section-full">
             <div class="table-wrap">
                 <table>
-                    <thead><tr><th>Foto</th><th>Nama Menu</th><th>Kategori</th><th>Harga</th><th>Stok Sekarang</th><th>Update Stok</th><th>Tersedia</th></tr></thead>
+                    <thead><tr><th>Foto</th><th>Nama Menu</th><th>Kategori</th><th>Harga</th><th>Stok Sekarang</th><th>Update Stok</th><th>Tersedia</th><th style="text-align:center">Aksi</th></tr></thead>
                     <tbody>
                         @forelse($menuList ?? [] as $menu)
                         <tr>
@@ -493,9 +537,34 @@
                                     </label>
                                 </form>
                             </td>
+                            <td style="text-align:center">
+                                <div style="display:inline-flex; gap:6px;">
+                                    <button type="button" class="btn-icon" title="Edit menu"
+                                        @php
+                                            $menuData = [
+                                                'id'           => $menu->id,
+                                                'nama_menu'    => $menu->nama_menu,
+                                                'kategori'     => $menu->kategori,
+                                                'harga'        => (float) $menu->harga,
+                                                'stok'         => (int) $menu->stok,
+                                                'deskripsi'    => $menu->deskripsi,
+                                                'is_available' => (bool) $menu->is_available,
+                                                'foto'         => $menu->foto ? asset('storage/' . $menu->foto) : null,
+                                            ];
+                                        @endphp
+                                        <button type="button" class="btn-icon" title="Edit menu"
+                                            onclick="openModalEdit({{ json_encode($menuData, JSON_HEX_APOS | JSON_HEX_QUOT) }})">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                    </button>
+                                    <button type="button" class="btn-icon btn-icon-danger" title="Hapus menu"
+                                        onclick="openModalHapus({{ $menu->id }}, '{{ addslashes($menu->nama_menu) }}')">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                         @empty
-                        <tr><td colspan="7"><div class="empty-state"><div class="empty-icon" style="color:#ccc"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg></div><p>Belum ada menu.</p></div></td></tr>
+                        <tr><td colspan="8"><div class="empty-state"><div class="empty-icon" style="color:#ccc"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg></div><p>Belum ada menu. Klik <b>Tambah Menu</b> untuk menambahkan.</p></div></td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -505,7 +574,98 @@
 
 </main>
 
+{{-- ===== MODAL: TAMBAH / EDIT MENU ===== --}}
+<div id="modal-menu" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-title" id="modal-menu-title">Tambah Menu Baru</div>
+            <button type="button" class="modal-close" onclick="closeModal('modal-menu')">×</button>
+        </div>
+        <form id="form-menu" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div id="modal-method-field"></div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Nama Menu <span class="required">*</span></label>
+                    <input type="text" name="nama_menu" id="f-nama_menu" class="form-control" required maxlength="100" placeholder="Contoh: Nasi Goreng Spesial">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Kategori <span class="required">*</span></label>
+                        <select name="kategori" id="f-kategori" class="form-control" required>
+                            <option value="">-- Pilih --</option>
+                            <option value="makanan">Makanan</option>
+                            <option value="minuman">Minuman</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Harga (Rp) <span class="required">*</span></label>
+                        <input type="number" name="harga" id="f-harga" class="form-control" required min="0" max="9999999" step="100" placeholder="5000">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Stok Awal <span class="required">*</span></label>
+                    <input type="number" name="stok" id="f-stok" class="form-control" required min="0" max="999" placeholder="0">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Deskripsi</label>
+                    <textarea name="deskripsi" id="f-deskripsi" class="form-control" maxlength="500" placeholder="Deskripsi singkat menu..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Foto Menu</label>
+                    <div id="f-foto-preview" style="display:none; margin-bottom:8px;">
+                        <img id="f-foto-img" src="" alt="" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid var(--border);">
+                    </div>
+                    <input type="file" name="foto" id="f-foto" class="form-control" accept="image/jpeg,image/jpg,image/png,image/webp">
+                    <div class="form-hint">JPG, PNG, atau WEBP. Maksimal 2MB. Kosongkan kalau tidak ingin mengubah foto.</div>
+                </div>
+
+                <div class="form-group">
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                        <input type="checkbox" name="is_available" id="f-is_available" value="1" checked style="width:16px; height:16px; cursor:pointer;">
+                        <span style="font-size:13px; font-weight:500;">Tersedia untuk dipesan</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal('modal-menu')">Batal</button>
+                <button type="submit" class="btn btn-teal" id="modal-menu-submit">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- ===== MODAL: KONFIRMASI HAPUS ===== --}}
+<div id="modal-hapus" class="modal-overlay">
+    <div class="modal-box" style="max-width:420px;">
+        <div class="modal-header">
+            <div class="modal-title" style="color:var(--danger);">⚠️ Hapus Menu?</div>
+            <button type="button" class="modal-close" onclick="closeModal('modal-hapus')">×</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size:14px; color:var(--text); line-height:1.5;">
+                Apakah kamu yakin ingin menghapus menu <b id="hapus-nama">-</b>?
+            </p>
+            <p style="font-size:12px; color:var(--muted); margin-top:10px;">
+                Tindakan ini tidak bisa dibatalkan. Foto menu juga akan dihapus.
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline" onclick="closeModal('modal-hapus')">Batal</button>
+            <form id="form-hapus" method="POST" style="display:inline;">
+                @csrf @method('DELETE')
+                <button type="submit" class="btn btn-danger">Ya, Hapus</button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
+    // ===== FLASH MESSAGE AUTO-HIDE =====
     const flashMsg = document.getElementById('flash-message');
     if (flashMsg) {
         setTimeout(() => {
@@ -514,6 +674,7 @@
         }, 3000);
     }
 
+    // ===== PAGE NAVIGATION =====
     function showPage(page) {
         ['dashboard','pesanan','stok'].forEach(p => {
             document.getElementById('page-' + p).style.display = p === page ? 'block' : 'none';
@@ -530,6 +691,95 @@
             row.style.display = (status === 'semua' || row.dataset.status === status) ? '' : 'none';
         });
     }
+
+    // ===== MODAL HANDLERS =====
+    const ROUTE_STORE  = "{{ route('penjual.stok.store') }}";
+    const ROUTE_BASE   = "{{ url('penjual/stok') }}"; // /{id} ditambahkan di JS
+
+    function openModal(id) {
+        document.getElementById(id).classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    function openModalTambah() {
+        document.getElementById('modal-menu-title').textContent  = 'Tambah Menu Baru';
+        document.getElementById('modal-menu-submit').textContent = 'Tambah Menu';
+        document.getElementById('form-menu').action              = ROUTE_STORE;
+        document.getElementById('modal-method-field').innerHTML  = '';
+
+        // Reset form
+        document.getElementById('form-menu').reset();
+        document.getElementById('f-foto-preview').style.display = 'none';
+        document.getElementById('f-is_available').checked = true;
+
+        openModal('modal-menu');
+    }
+
+    function openModalEdit(data) {
+        document.getElementById('modal-menu-title').textContent  = 'Edit Menu';
+        document.getElementById('modal-menu-submit').textContent = 'Simpan Perubahan';
+        document.getElementById('form-menu').action              = ROUTE_BASE + '/' + data.id;
+        document.getElementById('modal-method-field').innerHTML  = '<input type="hidden" name="_method" value="PUT">';
+
+        // Isi field
+        document.getElementById('f-nama_menu').value      = data.nama_menu || '';
+        document.getElementById('f-kategori').value       = data.kategori || '';
+        document.getElementById('f-harga').value          = data.harga || 0;
+        document.getElementById('f-stok').value           = data.stok || 0;
+        document.getElementById('f-deskripsi').value      = data.deskripsi || '';
+        document.getElementById('f-is_available').checked = !!data.is_available;
+        document.getElementById('f-foto').value           = '';
+
+        // Preview foto lama
+        if (data.foto) {
+            document.getElementById('f-foto-img').src = data.foto;
+            document.getElementById('f-foto-preview').style.display = 'block';
+        } else {
+            document.getElementById('f-foto-preview').style.display = 'none';
+        }
+
+        openModal('modal-menu');
+    }
+
+    function openModalHapus(id, nama) {
+        document.getElementById('hapus-nama').textContent = nama;
+        document.getElementById('form-hapus').action = ROUTE_BASE + '/' + id;
+        openModal('modal-hapus');
+    }
+
+    // Tutup modal kalau klik di luar box
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', e => {
+            if (e.target === overlay) closeModal(overlay.id);
+        });
+    });
+
+    // Tutup modal dengan ESC
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.show').forEach(m => closeModal(m.id));
+        }
+    });
+
+    // Auto-buka tab Stok kalau redirect dengan #stok
+    if (window.location.hash === '#stok') {
+        showPage('stok');
+    }
+
+    // Auto-buka modal kalau ada validation error (UX nice-to-have)
+    @if($errors->any() && old('nama_menu'))
+        showPage('stok');
+        openModalTambah();
+        document.getElementById('f-nama_menu').value = @json(old('nama_menu'));
+        document.getElementById('f-kategori').value  = @json(old('kategori'));
+        document.getElementById('f-harga').value     = @json(old('harga'));
+        document.getElementById('f-stok').value      = @json(old('stok'));
+        document.getElementById('f-deskripsi').value = @json(old('deskripsi'));
+    @endif
 </script>
 </body>
 </html>

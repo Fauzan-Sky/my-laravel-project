@@ -75,9 +75,14 @@ Route::middleware('auth.penjual')->prefix('penjual')->name('penjual.')->group(fu
     Route::get('/dashboard',              [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/laporan',                [LaporanController::class, 'index'])->name('laporan');
     Route::patch('/pesanan/{id}/status',  [PesananController::class, 'updateStatus'])->name('pesanan.updateStatus');
-    Route::patch('/stok/{id}',            [StokController::class, 'update'])->name('stok.update');
-    Route::patch('/stok/{id}/available',  [StokController::class, 'toggleAvailable'])->name('stok.toggleAvailable');
-    Route::post('/stok/{id}/foto',        [StokController::class, 'uploadFoto'])->name('stok.uploadFoto');
+
+    // === STOK / MENU ===
+    Route::post  ('/stok',                [StokController::class, 'store'])->name('stok.store');
+    Route::put   ('/stok/{id}',           [StokController::class, 'editUpdate'])->name('stok.editUpdate');
+    Route::delete('/stok/{id}',           [StokController::class, 'destroy'])->name('stok.destroy');
+    Route::patch ('/stok/{id}',           [StokController::class, 'update'])->name('stok.update');
+    Route::patch ('/stok/{id}/available', [StokController::class, 'toggleAvailable'])->name('stok.toggleAvailable');
+    Route::post  ('/stok/{id}/foto',      [StokController::class, 'uploadFoto'])->name('stok.uploadFoto');
 });
 
 // ══════════════════════════════════════════════════════════
