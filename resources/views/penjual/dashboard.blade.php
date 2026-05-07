@@ -397,9 +397,9 @@
                             </td>
                             <td style="font-weight:700">Rp {{ number_format($p->total_harga, 0, ',', '.') }}</td>
                             <td style="font-size:12px">
-                                @if($p->slotWaktu)
-                                    <div style="font-weight:600; color:var(--teal)">{{ $p->slotWaktu->label_slot }}</div>
-                                    <div style="color:var(--muted)">{{ \Carbon\Carbon::parse($p->slotWaktu->jam_mulai)->format('H:i') }} – {{ \Carbon\Carbon::parse($p->slotWaktu->jam_selesai)->format('H:i') }}</div>
+                                @if($p->slot)
+                                    <div style="font-weight:600; color:var(--teal)">{{ $p->slot->label_slot }}</div>
+                                    <div style="color:var(--muted)">{{ \Carbon\Carbon::parse($p->slot->jam_mulai)->format('H:i') }} – {{ \Carbon\Carbon::parse($p->slot->jam_selesai)->format('H:i') }}</div>
                                 @else
                                     <span style="color:var(--muted)">-</span>
                                 @endif

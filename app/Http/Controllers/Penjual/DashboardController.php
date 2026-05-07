@@ -59,7 +59,7 @@ class DashboardController extends Controller
             ->get();
 
         // Semua pesanan hari ini untuk tabel lengkap
-        $semuaPesanan = Pesanan::with(['user', 'detailPesanan.menu'])
+        $semuaPesanan = Pesanan::with(['user', 'detailPesanan.menu', 'slot'])
             ->where('kantin_id', $kantinId)
             ->whereDate('created_at', $today)
             ->latest()
