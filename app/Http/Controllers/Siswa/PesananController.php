@@ -36,7 +36,6 @@ class PesananController extends Controller
         try {
             DB::beginTransaction();
 
-            // Nomor antrean reset tiap hari per kantin
             $nomorAntrean = Pesanan::where('kantin_id', $request->kantin_id)
                 ->whereDate('created_at', today())
                 ->count() + 1;
@@ -60,7 +59,6 @@ class PesananController extends Controller
                     'subtotal'     => $item['subtotal'],
                 ]);
 
-                // Kurangi stok
                 Menu::where('id', $item['menu_id'])->decrement('stok', $item['jumlah']);
             }
 
@@ -79,5 +77,47 @@ class PesananController extends Controller
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    // ✅ Polling JS — cek apakah ada pesanan siswa yang statusnya ready
+    public function cekReady()
+    {
+        $user = Auth::guard('web')->user();
+
+        $pesanan = Pesanan::with('kantin')
+            ->where('user_id', $user->id)
+            ->where('status', 'ready')
+            ->whereDate('created_at', today())
+            ->first();
+
+        if (!$pesanan) {
+            return response()->json(['ada' => false]);
+        }
+
+        return response()->json([
+            'ada'            => true,
+            'pesanan_id'     => $pesanan->id,
+            'nomor_antrean'  => str_pad($pesanan->nomor_antrean, 3, '0', STR_PAD_LEFT),
+            'nama_kantin'    => $pesanan->kantin->nama_kantin ?? '-',
+            'deadline_ambil' => $pesanan->deadline_ambil?->format('H:i'),
+        ]);
+    }
+
+    // ✅ Siswa konfirmasi sudah ambil pesanan
+    public function konfirmasiAmbil($id)
+    {
+        $user = Auth::guard('web')->user();
+
+        $pesanan = Pesanan::where('id', $id)
+            ->where('user_id', $user->id)
+            ->where('status', 'ready')
+            ->firstOrFail();
+
+        $pesanan->update([
+            'status'        => 'picked',
+            'waktu_diambil' => now(),
+        ]);
+
+        return response()->json(['success' => true]);
     }
 }

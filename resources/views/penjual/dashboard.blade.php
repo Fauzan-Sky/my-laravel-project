@@ -212,6 +212,11 @@
 
         .btn-add-menu { display:inline-flex; align-items:center; gap:8px; padding:10px 18px; background:var(--teal); color:#fff; border:none; border-radius:10px; font-family:'Poppins',sans-serif; font-size:13px; font-weight:600; cursor:pointer; transition:background 0.2s; }
         .btn-add-menu:hover { background:var(--teal-dark); }
+
+        /* ✅ Tombol Tandai Diambil */
+        .btn-picked { background:#27ae60; color:#fff; font-size:11px; padding:5px 10px; border:none; border-radius:8px; font-family:'Poppins',sans-serif; font-weight:600; cursor:pointer; transition:background 0.2s; white-space:nowrap; }
+        .btn-picked:hover { background:#219a52; }
+        .deadline-text { font-size:11px; color:var(--danger); font-weight:600; margin-top:4px; }
     </style>
 </head>
 <body>
@@ -408,7 +413,7 @@
                         <tr>
                             <th>Antrean</th><th>Pembeli</th><th>Kelas</th><th>Menu</th>
                             <th>Total</th><th>Jadwal</th><th>Bayar</th><th>Waktu</th>
-                            <th>Status</th><th>Ubah Status</th>
+                            <th>Status</th><th>Ubah Status</th><th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -458,9 +463,23 @@
                                 <span style="font-size:11px; color:#e74c3c; font-weight:600;">⛔ Kantin Tutup</span>
                                 @endif
                             </td>
+                            {{-- ✅ Kolom Aksi: Tombol Tandai Diambil --}}
+                            <td>
+                                @if($p->status === 'ready' && $isKantinBuka)
+                                    <form method="POST" action="{{ route('penjual.pesanan.tandaiDiambil', $p->id) }}">
+                                        @csrf @method('PATCH')
+                                        <button type="submit" class="btn-picked">✓ Tandai Diambil</button>
+                                    </form>
+                                    @if($p->deadline_ambil)
+                                        <div class="deadline-text">⏱ Batas: {{ $p->deadline_ambil->format('H:i') }}</div>
+                                    @endif
+                                @else
+                                    <span style="color:var(--muted); font-size:12px;">-</span>
+                                @endif
+                            </td>
                         </tr>
                         @empty
-                        <tr><td colspan="10"><div class="empty-state"><div class="empty-icon" style="color:#ccc"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></div><p>Belum ada pesanan</p></div></td></tr>
+                        <tr><td colspan="11"><div class="empty-state"><div class="empty-icon" style="color:#ccc"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></div><p>Belum ada pesanan</p></div></td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -539,22 +558,21 @@
                             </td>
                             <td style="text-align:center">
                                 <div style="display:inline-flex; gap:6px;">
+                                    @php
+                                        $menuData = [
+                                            'id'           => $menu->id,
+                                            'nama_menu'    => $menu->nama_menu,
+                                            'kategori'     => $menu->kategori,
+                                            'harga'        => (float) $menu->harga,
+                                            'stok'         => (int) $menu->stok,
+                                            'deskripsi'    => $menu->deskripsi,
+                                            'is_available' => (bool) $menu->is_available,
+                                            'foto'         => $menu->foto ? asset('storage/' . $menu->foto) : null,
+                                        ];
+                                    @endphp
                                     <button type="button" class="btn-icon" title="Edit menu"
-                                        @php
-                                            $menuData = [
-                                                'id'           => $menu->id,
-                                                'nama_menu'    => $menu->nama_menu,
-                                                'kategori'     => $menu->kategori,
-                                                'harga'        => (float) $menu->harga,
-                                                'stok'         => (int) $menu->stok,
-                                                'deskripsi'    => $menu->deskripsi,
-                                                'is_available' => (bool) $menu->is_available,
-                                                'foto'         => $menu->foto ? asset('storage/' . $menu->foto) : null,
-                                            ];
-                                        @endphp
-                                        <button type="button" class="btn-icon" title="Edit menu"
-                                            onclick="openModalEdit({{ json_encode($menuData, JSON_HEX_APOS | JSON_HEX_QUOT) }})">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                        onclick="openModalEdit({{ json_encode($menuData, JSON_HEX_APOS | JSON_HEX_QUOT) }})">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                     </button>
                                     <button type="button" class="btn-icon btn-icon-danger" title="Hapus menu"
                                         onclick="openModalHapus({{ $menu->id }}, '{{ addslashes($menu->nama_menu) }}')">
@@ -694,7 +712,7 @@
 
     // ===== MODAL HANDLERS =====
     const ROUTE_STORE  = "{{ route('penjual.stok.store') }}";
-    const ROUTE_BASE   = "{{ url('penjual/stok') }}"; // /{id} ditambahkan di JS
+    const ROUTE_BASE   = "{{ url('penjual/stok') }}";
 
     function openModal(id) {
         document.getElementById(id).classList.add('show');
@@ -711,7 +729,6 @@
         document.getElementById('form-menu').action              = ROUTE_STORE;
         document.getElementById('modal-method-field').innerHTML  = '';
 
-        // Reset form
         document.getElementById('form-menu').reset();
         document.getElementById('f-foto-preview').style.display = 'none';
         document.getElementById('f-is_available').checked = true;
@@ -725,7 +742,6 @@
         document.getElementById('form-menu').action              = ROUTE_BASE + '/' + data.id;
         document.getElementById('modal-method-field').innerHTML  = '<input type="hidden" name="_method" value="PUT">';
 
-        // Isi field
         document.getElementById('f-nama_menu').value      = data.nama_menu || '';
         document.getElementById('f-kategori').value       = data.kategori || '';
         document.getElementById('f-harga').value          = data.harga || 0;
@@ -734,7 +750,6 @@
         document.getElementById('f-is_available').checked = !!data.is_available;
         document.getElementById('f-foto').value           = '';
 
-        // Preview foto lama
         if (data.foto) {
             document.getElementById('f-foto-img').src = data.foto;
             document.getElementById('f-foto-preview').style.display = 'block';
@@ -751,26 +766,22 @@
         openModal('modal-hapus');
     }
 
-    // Tutup modal kalau klik di luar box
     document.querySelectorAll('.modal-overlay').forEach(overlay => {
         overlay.addEventListener('click', e => {
             if (e.target === overlay) closeModal(overlay.id);
         });
     });
 
-    // Tutup modal dengan ESC
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
             document.querySelectorAll('.modal-overlay.show').forEach(m => closeModal(m.id));
         }
     });
 
-    // Auto-buka tab Stok kalau redirect dengan #stok
     if (window.location.hash === '#stok') {
         showPage('stok');
     }
 
-    // Auto-buka modal kalau ada validation error (UX nice-to-have)
     @if($errors->any() && old('nama_menu'))
         showPage('stok');
         openModalTambah();

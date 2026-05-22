@@ -18,7 +18,10 @@ use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\KantinController;
 use App\Http\Controllers\Auth\ForgotPasswordSiswaController;
 use App\Http\Controllers\Siswa\ProfileController;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Route;
+
+Schedule::command('pesanan:auto-cancel')->everyMinute();
 
 // ══════════════════════════════════════════════════════════
 //  ROOT REDIRECT
@@ -65,6 +68,10 @@ Route::middleware('auth.siswa')->prefix('siswa')->name('siswa.')->group(function
     // ─── Profile ───────────────────────────────────────
     Route::get('/profile',           [ProfileController::class, 'index'])->name('profile');
     Route::put('/profile',           [ProfileController::class, 'update'])->name('profile.update');
+
+    // ─── Konfirmasi Ambil ──────────────────────────────
+    Route::patch('/pesanan/{id}/konfirmasi', [SiswaPesanan::class, 'konfirmasiAmbil'])->name('pesanan.konfirmasi'); // ✅ Tambah ini
+    Route::get('/pesanan/cek-ready',        [SiswaPesanan::class, 'cekReady'])->name('pesanan.cekReady');          // ✅ Tambah ini (untuk polling JS)
 });
 
 // ══════════════════════════════════════════════════════════
@@ -75,6 +82,8 @@ Route::middleware('auth.penjual')->prefix('penjual')->name('penjual.')->group(fu
     Route::get('/dashboard',              [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/laporan',                [LaporanController::class, 'index'])->name('laporan');
     Route::patch('/pesanan/{id}/status',  [PesananController::class, 'updateStatus'])->name('pesanan.updateStatus');
+    Route::patch('/pesanan/{id}/picked',  [PesananController::class, 'tandaiDiambil'])->name('pesanan.tandaiDiambil'); // ✅ Tambah ini
+
 
     // === STOK / MENU ===
     Route::post  ('/stok',                [StokController::class, 'store'])->name('stok.store');

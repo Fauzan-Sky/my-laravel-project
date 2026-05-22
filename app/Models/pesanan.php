@@ -18,12 +18,14 @@ class Pesanan extends Model
         'catatan',
         'tanggal_pesan',
         'waktu_diambil',
+        'deadline_ambil', // ✅ Tambah ini
     ];
 
     protected $casts = [
         'total_harga'   => 'decimal:2',
         'tanggal_pesan' => 'datetime',
         'waktu_diambil' => 'datetime',
+        'deadline_ambil' => 'datetime', // ✅ Tambah ini
     ];
 
     public function getStatusBadgeAttribute(): array
@@ -35,6 +37,12 @@ class Pesanan extends Model
             'picked'     => ['label' => 'Selesai',    'class' => 'badge-gray'],
             default      => ['label' => 'Batal',      'class' => 'badge-danger'],
         };
+    }
+
+    // ✅ Tambah helper method
+    public function isExpired(): bool
+    {
+        return $this->deadline_ambil && now()->greaterThan($this->deadline_ambil);
     }
 
     public function user()
@@ -52,7 +60,6 @@ class Pesanan extends Model
         return $this->belongsTo(SlotWaktu::class, 'slot_id');
     }
 
-    // ✅ Diperbaiki: ditambah alias detailPesanan
     public function detail()
     {
         return $this->hasMany(DetailPesanan::class, 'pesanan_id');

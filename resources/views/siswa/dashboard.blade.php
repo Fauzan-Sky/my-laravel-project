@@ -548,6 +548,97 @@
         .page-subtitle { font-size: 13px; color: var(--muted); margin-top: 3px; }
 
         /* ══════════════════════════════════════════
+           NOTIFIKASI POP-UP READY
+        ══════════════════════════════════════════ */
+        .notif-overlay {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .notif-overlay.show { display: block; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .notif-box {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            border-left: 5px solid var(--success);
+            padding: 20px 22px;
+            min-width: 300px;
+            max-width: 360px;
+        }
+
+        .notif-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .notif-icon {
+            width: 36px; height: 36px;
+            background: #eafaf1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 18px;
+        }
+
+        .notif-title  { font-size: 14px; font-weight: 700; color: var(--text); }
+        .notif-sub    { font-size: 12px; color: var(--muted); margin-top: 2px; }
+        .notif-detail { font-size: 13px; color: var(--text); margin-bottom: 14px; line-height: 1.5; }
+
+        .notif-deadline {
+            font-size: 12px;
+            color: var(--danger);
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+
+        .notif-actions { display: flex; gap: 8px; }
+
+        .btn-notif-confirm {
+            flex: 1;
+            padding: 9px;
+            background: var(--success);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-notif-confirm:hover { background: #219a52; }
+
+        .btn-notif-later {
+            padding: 9px 14px;
+            background: transparent;
+            color: var(--muted);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-notif-later:hover { border-color: var(--teal); color: var(--teal); }
+
+        /* ══════════════════════════════════════════
            RESPONSIVE
         ══════════════════════════════════════════ */
         @media (max-width: 900px) {
@@ -566,6 +657,9 @@
             .nav-link      { padding: 8px 10px; }
 
             .tab-bar { width: 100%; overflow-x: auto; }
+
+            .notif-overlay { bottom: 16px; right: 16px; left: 16px; }
+            .notif-box     { min-width: unset; max-width: 100%; }
         }
 
         @media (max-width: 480px) {
@@ -971,6 +1065,32 @@
 
 </div>{{-- end .page-content --}}
 
+{{-- ═══════════════════════════════════════════════════
+     NOTIFIKASI PESANAN SIAP (POP-UP)
+═══════════════════════════════════════════════════ --}}
+<div id="notif-ready" class="notif-overlay">
+    <div class="notif-box">
+        <div class="notif-header">
+            <div class="notif-icon">🍱</div>
+            <div>
+                <div class="notif-title">Pesanan Siap Diambil!</div>
+                <div class="notif-sub" id="notif-kantin">-</div>
+            </div>
+        </div>
+        <div class="notif-detail">
+            Pesanan <b id="notif-antrean">#000</b> kamu sudah siap.<br>
+            Segera ambil di kantin ya!
+        </div>
+        <div class="notif-deadline" id="notif-deadline"></div>
+        <div class="notif-actions">
+            <button class="btn-notif-confirm" id="btn-konfirmasi" onclick="konfirmasiAmbil()">
+                ✓ Saya Sudah Ambil
+            </button>
+            <button class="btn-notif-later" onclick="tutupNotif()">Nanti</button>
+        </div>
+    </div>
+</div>
+
 <script>
     /* ══════════════════════════════════════════
        PAGE NAVIGATION
@@ -1036,6 +1156,71 @@
                 setTimeout(function() { alert.remove(); }, 500);
             }, 3000);
         });
+    });
+
+    /* ══════════════════════════════════════════
+       POLLING NOTIFIKASI PESANAN READY
+    ══════════════════════════════════════════ */
+    let pesananReadyId = null;
+    let pollingInterval = null;
+
+    async function cekPesananReady() {
+        try {
+            const res  = await fetch("{{ route('siswa.pesanan.cekReady') }}");
+            const data = await res.json();
+
+            if (data.ada && data.pesanan_id !== pesananReadyId) {
+                pesananReadyId = data.pesanan_id;
+                document.getElementById('notif-kantin').textContent   = data.nama_kantin;
+                document.getElementById('notif-antrean').textContent  = '#' + data.nomor_antrean;
+                document.getElementById('notif-deadline').textContent = data.deadline_ambil
+                    ? '⏱ Ambil sebelum ' + data.deadline_ambil
+                    : '';
+                document.getElementById('notif-ready').classList.add('show');
+            }
+
+            if (!data.ada) {
+                tutupNotif();
+                pesananReadyId = null;
+            }
+
+        } catch (e) {
+            console.error('Polling error:', e);
+        }
+    }
+
+    async function konfirmasiAmbil() {
+        if (!pesananReadyId) return;
+
+        try {
+            const res = await fetch(`/siswa/pesanan/${pesananReadyId}/konfirmasi`, {
+                method: 'PATCH',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                tutupNotif();
+                pesananReadyId = null;
+                // Refresh halaman biar status tabel ikut update
+                setTimeout(() => location.reload(), 500);
+            }
+        } catch (e) {
+            console.error('Konfirmasi error:', e);
+        }
+    }
+
+    function tutupNotif() {
+        document.getElementById('notif-ready').classList.remove('show');
+    }
+
+    // Mulai polling saat halaman load
+    document.addEventListener('DOMContentLoaded', function() {
+        cekPesananReady(); // cek langsung pertama kali
+        pollingInterval = setInterval(cekPesananReady, 10000); // tiap 10 detik
     });
 </script>
 
